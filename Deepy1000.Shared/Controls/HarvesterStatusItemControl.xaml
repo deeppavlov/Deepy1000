@@ -1,0 +1,25 @@
+﻿<UserControl
+    x:Class="Deepy1000.Shared.Controls.HarvesterStatusItemControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Deepy1000.Shared.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Foreground="Black"
+    Background="White"
+    d:DesignHeight="80"
+    d:DesignWidth="590">
+
+    <Grid Background="{x:Bind Background}" Margin="-13,0,-20,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="135"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="160"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="HarvesterNumberTextBlock" Text="{x:Bind HarvesterNumber, Mode=OneWay}" Margin="10,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" HorizontalTextAlignment="Left" FontSize="65" FontFamily="Eurostile Extd" Foreground="{x:Bind Foreground}" FontWeight="Bold" Grid.Column="0" />
+        <TextBlock x:Name="HarvesterStatusTextBlock" Text="{x:Bind HarvesterStatus, Mode=OneWay}" Margin="0,0,0,11" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" HorizontalTextAlignment="Left"  FontSize="30" FontFamily="Eurostile Extd" Foreground="{x:Bind Foreground}" FontWeight="Bold" Grid.Column="1" />
+        <TextBlock x:Name="HarvesterLoadTextBlock" Text="{x:Bind HarvesterLoad, Mode=OneWay}" Margin="0,0,0,11" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" HorizontalTextAlignment="Left"  FontSize="30" FontFamily="Eurostile Extd" Foreground="{x:Bind Foreground}" FontWeight="Bold" Grid.Column="2" />
+
+    </Grid>
+</UserControl>

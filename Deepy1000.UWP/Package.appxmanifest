@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity
+    Name="525d42f5-bb69-4a31-9f99-2783c2e5d956"
+    Publisher="CN=danie"
+    Version="1.0.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="8b60dbe1-8954-454a-8676-c3f3809cd88b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>Deepy 1000</DisplayName>
+    <PublisherDisplayName>DeepPavlov.ai</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="Deepy1000.exe"
+      EntryPoint="Deepy1000.App">
+      <uap:VisualElements
+        DisplayName="Deepy 3000"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        Description="Deepy 1000 - a Moon Base AI Assistant. Inspired by Gerty 3000 from The Moon Movie (2009) by Sony Classics."
+        BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <DeviceCapability Name="webcam"/>
+    <DeviceCapability Name="microphone"/>
+  </Capabilities>
+</Package>

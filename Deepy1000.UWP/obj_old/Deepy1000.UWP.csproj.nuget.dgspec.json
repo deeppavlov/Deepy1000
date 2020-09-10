@@ -1,0 +1,94 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\stuff\\dev\\deeppavlov\\demos\\GTCFall2020\\Deepy1000\\Deepy1000.UWP\\Deepy1000.UWP.csproj": {}
+  },
+  "projects": {
+    "C:\\stuff\\dev\\deeppavlov\\demos\\GTCFall2020\\Deepy1000\\Deepy1000.UWP\\Deepy1000.UWP.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\stuff\\dev\\deeppavlov\\demos\\GTCFall2020\\Deepy1000\\Deepy1000.UWP\\Deepy1000.UWP.csproj",
+        "projectName": "Deepy1000.UWP",
+        "projectPath": "C:\\stuff\\dev\\deeppavlov\\demos\\GTCFall2020\\Deepy1000\\Deepy1000.UWP\\Deepy1000.UWP.csproj",
+        "packagesPath": "C:\\Users\\danie\\.nuget\\packages\\",
+        "outputPath": "C:\\stuff\\dev\\deeppavlov\\demos\\GTCFall2020\\Deepy1000\\Deepy1000.UWP\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\",
+          "C:\\Program Files (x86)\\Microsoft SDKs\\UWPNuGetPackages\\"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\danie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "uap10.0.17763"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "uap10.0.17763": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "uap10.0.17763": {
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Console": {
+              "target": "Package",
+              "version": "[1.1.1, )"
+            },
+            "Microsoft.Extensions.Logging.Filter": {
+              "target": "Package",
+              "version": "[1.1.1, )"
+            },
+            "Microsoft.NETCore.UniversalWindowsPlatform": {
+              "target": "Package",
+              "version": "[6.2.9, )"
+            },
+            "Uno.Core": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
+            "Uno.UI": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            }
+          },
+          "imports": [
+            "net461"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      },
+      "runtimes": {
+        "win10-arm": {
+          "#import": []
+        },
+        "win10-arm-aot": {
+          "#import": []
+        },
+        "win10-arm64-aot": {
+          "#import": []
+        },
+        "win10-x64": {
+          "#import": []
+        },
+        "win10-x64-aot": {
+          "#import": []
+        },
+        "win10-x86": {
+          "#import": []
+        },
+        "win10-x86-aot": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

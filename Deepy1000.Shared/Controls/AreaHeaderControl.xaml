@@ -1,0 +1,18 @@
+﻿<UserControl
+    x:Class="Deepy1000.Shared.Controls.AreaHeaderControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Deepy1000.Shared.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Foreground="Black"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <StackPanel Margin="5">
+        <TextBlock x:Name="TitleTextBlock" Text="{x:Bind Title}" Margin="5,5,5,-5" FontSize="50" FontFamily="Eurostile Extd" Foreground="{x:Bind Foreground}" FontWeight="Bold" />
+        <TextBlock  x:Name="SubtitleTextBlock" Text="{x:Bind Subtitle}" Margin="5,0,5,5" FontSize="30" FontFamily="Eurostile Extd" Foreground="{x:Bind Foreground}" FontWeight="Bold" />
+
+    </StackPanel>
+</UserControl>
