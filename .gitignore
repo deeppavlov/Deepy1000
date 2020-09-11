@@ -338,3 +338,17 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/Deepy1000.Shared/Schemas/ToxicClassification.cs
+/Deepy1000.Shared/Schemas/TextualEntailmentPayload.cs
+/Deepy1000.Shared/Schemas/Hypothesis.cs
+/Deepy1000.Shared/Schemas/Conversation.Users.cs
+/Deepy1000.Shared/Schemas/Conversation.Extensions.cs
+/Deepy1000.Shared/Schemas/Conversation.cs
+/Deepy1000.Shared/Schemas/CometResult.cs
+/Deepy1000.Shared/Schemas/CometInput.cs
+/Deepy1000.Shared/Schemas/CometFinalExpResult.cs
+/Deepy1000.Shared/Schemas/CometConceptNetResponse.cs
+/Deepy1000.Shared/Schemas/CometConceptNetRelations.cs
+/Deepy1000.Shared/Schemas/BookSearchResult.cs
+/Deepy1000.Shared/Schemas/BlacklistedWords.cs
+/Deepy1000.Shared/Schemas/Annotations.cs

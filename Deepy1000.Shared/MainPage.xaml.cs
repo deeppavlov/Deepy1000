@@ -24,6 +24,9 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
+using Newtonsoft.Json;
+using DeepPavlov.Dream.Schemas;
+using System.Net.Mime;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -62,8 +65,7 @@ namespace Deepy1000
         {
             this.InitializeComponent();
 
-            
-            
+            this.HumanInputTextBox.KeyDown += HumanInputTextBox_KeyDown;
 
             userId = Guid.NewGuid().ToString("N");
 
@@ -100,9 +102,87 @@ namespace Deepy1000
 
         }
 
-        private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        private async void HumanInputTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
+            if (e.Key == Windows.System.VirtualKey.Enter)
+            {
+                Tuple<StorageFile, string, string, string> result = await SendCallToAgentAsync();
 
+                ShowResponse(result);
+            }
+        }
+
+        private async Task<Tuple<StorageFile, string, string, string>> SendCallToAgentAsync()
+        {
+            Tuple<StorageFile, string, string, string> result = null;
+
+            //Create an HTTP client object
+            if (httpClient == null)
+                httpClient = new Windows.Web.Http.HttpClient();
+
+            //Add a user-agent header to the GET request. 
+            var headers = httpClient.DefaultRequestHeaders;
+
+            //The safe way to add a header value is to use the TryParseAdd method and verify the return value is true,
+            //especially if the header value is coming from user input.
+            string header = "ie";
+            if (!headers.UserAgent.TryParseAdd(header))
+            {
+                throw new Exception("Invalid header value: " + header);
+            }
+
+            header = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+            if (!headers.UserAgent.TryParseAdd(header))
+            {
+                throw new Exception("Invalid header value: " + header);
+            }
+
+            Uri requestUri = new Uri("http://10.11.1.41:4242/");
+
+            var body = new Dictionary<string, string>();
+            body["user_id"] = userId;
+            body["payload"] = HumanInputTextBox.Text;
+
+            var json = JsonConvert.SerializeObject(body);
+
+            // preparing for HTTP transfer
+            HttpStringContent stringContent = new HttpStringContent(json, UnicodeEncoding.Utf8, "application/json");
+
+            // preparing POST request
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+
+            // 100 sec
+            cts = new CancellationTokenSource(100000);
+
+            HttpResponseMessage response = await httpClient.PostAsync(requestUri, stringContent).AsTask(cts.Token);
+            response.EnsureSuccessStatusCode();
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var responseContent = JsonConvert.DeserializeObject<Dialog>(responseString);
+
+            string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput[0].Annotations.EmotionClassification);
+
+            result = new Tuple<StorageFile, string, string, string>(null, HumanInputTextBox.Text, responseContent.Response, emotion);
+
+            return result;
+        }
+
+        private string GetTopEmotionFromClassification(EmotionClassification emotionClassification)
+        {
+            if (emotionClassification == null)
+                return "neutral";
+
+            Dictionary<string, double> emotions = new Dictionary<string, double>();
+            emotions.Add("anger", emotionClassification.Anger);
+            emotions.Add("fear", emotionClassification.Fear);
+            emotions.Add("joy", emotionClassification.Joy);
+            emotions.Add("Love", emotionClassification.Love);
+            emotions.Add("sadness", emotionClassification.Sadness);
+            emotions.Add("surprise", emotionClassification.Surprise);
+            emotions.Add("neutral", emotionClassification.Neutral);
+
+            return emotions.OrderByDescending(i => i.Value).FirstOrDefault().Key;
         }
 
         private async void DictateButton_Click(object sender, RoutedEventArgs e)
@@ -135,57 +215,10 @@ namespace Deepy1000
                 var result = await SendCallToAgentProxyAsync(inputWavFile);
                 if (result!=null)
                 {
-                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(result.Item1); 
+                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(result.Item1);
                     mediaPlayer.Play();
 
-                    // we shall also show what was recognized
-                    this.HumanInputTextBox.Text = result.Item2.ToUpper();
-
-                    // we shall also show bot's response
-                    this.BotResponseTextBlock.Text = result.Item3.ToUpper();
-
-                    // we shall also reflect recognized information shown as image
-                    var botFeelings = GetDeepyEmotionalState(result.Item3);
-
-                    switch (botFeelings)
-                    {
-                        case BehaviorConstants.DeepyEmotions.gerty_tongue:
-                            DeepyEmotionalStateImage.Source = this.gerty_tongue_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_wink:
-                            DeepyEmotionalStateImage.Source = this.gerty_wink_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_big_smile:
-                            DeepyEmotionalStateImage.Source = this.gerty_big_smile_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_smile:
-                            DeepyEmotionalStateImage.Source = this.gerty_smile_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_neutral:
-                            DeepyEmotionalStateImage.Source = this.gerty_neutral_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_confused:
-                            DeepyEmotionalStateImage.Source = this.gerty_confused_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_worried:
-                            DeepyEmotionalStateImage.Source = this.gerty_worried_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_sad:
-                            DeepyEmotionalStateImage.Source = this.gerty_sad_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_nervous_1:
-                            DeepyEmotionalStateImage.Source = this.gerty_nervous_1_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_nervous_2:
-                            DeepyEmotionalStateImage.Source = this.gerty_nervous_2_image;
-                            break;
-                        case BehaviorConstants.DeepyEmotions.gerty_very_sad:
-                            DeepyEmotionalStateImage.Source = this.gerty_very_sad_image;
-                            break;
-                        default:
-                            DeepyEmotionalStateImage.Source = this.gerty_neutral_image;
-                            break;
-                    }
+                    ShowResponse(result);
                 }
             }
             else
@@ -204,9 +237,61 @@ namespace Deepy1000
             }
         }
 
-        private BehaviorConstants.DeepyEmotions GetDeepyEmotionalState(string item2)
+        private void ShowResponse(Tuple<StorageFile, string, string, string> result)
         {
-            var botUtterance = item2.ToLowerInvariant();
+            // we shall also show what was recognized
+            this.HumanInputTextBox.Text = result.Item2.ToUpper();
+
+            // we shall also show bot's response
+            this.BotResponseTextBlock.Text = result.Item3.ToUpper();
+
+            // we shall also reflect recognized information shown as image
+            var botFeelings = GetDeepyEmotionalState(result.Item3, result.Item4);
+
+            switch (botFeelings)
+            {
+                case BehaviorConstants.DeepyEmotions.gerty_tongue:
+                    DeepyEmotionalStateImage.Source = this.gerty_tongue_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_wink:
+                    DeepyEmotionalStateImage.Source = this.gerty_wink_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_big_smile:
+                    DeepyEmotionalStateImage.Source = this.gerty_big_smile_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_smile:
+                    DeepyEmotionalStateImage.Source = this.gerty_smile_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_neutral:
+                    DeepyEmotionalStateImage.Source = this.gerty_neutral_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_confused:
+                    DeepyEmotionalStateImage.Source = this.gerty_confused_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_worried:
+                    DeepyEmotionalStateImage.Source = this.gerty_worried_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_sad:
+                    DeepyEmotionalStateImage.Source = this.gerty_sad_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_nervous_1:
+                    DeepyEmotionalStateImage.Source = this.gerty_nervous_1_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_nervous_2:
+                    DeepyEmotionalStateImage.Source = this.gerty_nervous_2_image;
+                    break;
+                case BehaviorConstants.DeepyEmotions.gerty_very_sad:
+                    DeepyEmotionalStateImage.Source = this.gerty_very_sad_image;
+                    break;
+                default:
+                    DeepyEmotionalStateImage.Source = this.gerty_neutral_image;
+                    break;
+            }
+        }
+
+        private BehaviorConstants.DeepyEmotions GetDeepyEmotionalState(string botUtteranceOriginal, string emotion)
+        {
+            var botUtterance = botUtteranceOriginal.ToLowerInvariant();
 
             if (botUtterance.Contains("i don't know what to answer"))
                 return BehaviorConstants.DeepyEmotions.gerty_nervous_1;
@@ -214,13 +299,24 @@ namespace Deepy1000
                 return BehaviorConstants.DeepyEmotions.gerty_nervous_2;
             else if (botUtterance.Contains("i don't understand you"))
                 return BehaviorConstants.DeepyEmotions.gerty_confused;
+            else
+            {
+                // small override
+                if (emotion == "neutral") return BehaviorConstants.DeepyEmotions.gerty_smile;
+                if (emotion == "anger") return BehaviorConstants.DeepyEmotions.gerty_worried;
+                if (emotion == "fear") return BehaviorConstants.DeepyEmotions.gerty_nervous_1;
+                if (emotion == "joy") return BehaviorConstants.DeepyEmotions.gerty_big_smile;
+                if (emotion == "love") return BehaviorConstants.DeepyEmotions.gerty_wink;
+                if (emotion == "sadness") return BehaviorConstants.DeepyEmotions.gerty_very_sad;
+                if (emotion == "surprise") return BehaviorConstants.DeepyEmotions.gerty_tongue;
+            }
 
             return BehaviorConstants.DeepyEmotions.gerty_smile;
         }
 
-        private async Task<Tuple<StorageFile, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
+        private async Task<Tuple<StorageFile, string, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
         {
-            Tuple<StorageFile, string, string> result = null;
+            Tuple<StorageFile, string, string, string> result = null;
 
             StorageFile outputFile = null;
 
@@ -277,6 +373,7 @@ namespace Deepy1000
                         var responseHeaders = response.Headers;
                         var humanUtteranceTranscript = responseHeaders["transcript"];
                         var botUtteranceResponse = responseHeaders["response"];
+                        var emotion = responseHeaders["emotion"];
 
                         // preparing output file
                         var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -290,7 +387,7 @@ namespace Deepy1000
                             }
                         }
 
-                        result = new Tuple<StorageFile, string, string>(outputFile, humanUtteranceTranscript, botUtteranceResponse);
+                        result = new Tuple<StorageFile, string, string, string>(outputFile, humanUtteranceTranscript, botUtteranceResponse, emotion);
                     }
                     catch (Exception ex)
                     {

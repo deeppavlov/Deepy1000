@@ -6,7 +6,7 @@
     <SharedGUID>6279c845-92f8-4333-ab99-3d213163593c</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Gerty3000.Shared</Import_RootNamespace>
+    <Import_RootNamespace>Deepy1000.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
@@ -28,6 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\Dialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Controls\AreaHeaderControl.xaml">
