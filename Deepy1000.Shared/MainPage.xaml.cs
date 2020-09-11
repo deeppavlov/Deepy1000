@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deepy1000.Shared;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 
@@ -43,6 +45,19 @@ namespace Deepy1000
         MediaEncodingProfile mediaProfile;
         MediaPlayer mediaPlayer;
 
+        // images for Gerty
+        BitmapImage gerty_big_smile_image;
+        BitmapImage gerty_confused_image;
+        BitmapImage gerty_nervous_1_image;
+        BitmapImage gerty_nervous_2_image;
+        BitmapImage gerty_neutral_image;
+        BitmapImage gerty_sad_image;
+        BitmapImage gerty_smile_image;
+        BitmapImage gerty_tongue_image;
+        BitmapImage gerty_very_sad_image;
+        BitmapImage gerty_wink_image;
+        BitmapImage gerty_worried_image;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -58,6 +73,30 @@ namespace Deepy1000
 
             // Media Player
             mediaPlayer = new MediaPlayer();
+
+            // Assets for Images
+            gerty_big_smile_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_big_smile.png"));
+            gerty_confused_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_confused.png"));
+            gerty_nervous_1_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_nervous_1.png"));
+            gerty_nervous_2_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_nervous_2.png"));
+            gerty_neutral_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_neutral.png"));
+            gerty_sad_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_sad.png"));
+            gerty_smile_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_smile.png"));
+            gerty_tongue_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_tongue.png"));
+            gerty_very_sad_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_very_sad.png"));
+            gerty_wink_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_wink.png"));
+            gerty_worried_image =
+                     new BitmapImage(new Uri("ms-appx:///Assets/gerty_worried.png"));
 
         }
 
@@ -96,8 +135,57 @@ namespace Deepy1000
                 var result = await SendCallToAgentProxyAsync(inputWavFile);
                 if (result!=null)
                 {
-                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(result); 
+                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(result.Item1); 
                     mediaPlayer.Play();
+
+                    // we shall also show what was recognized
+                    this.HumanInputTextBox.Text = result.Item2.ToUpper();
+
+                    // we shall also show bot's response
+                    this.BotResponseTextBlock.Text = result.Item3.ToUpper();
+
+                    // we shall also reflect recognized information shown as image
+                    var botFeelings = GetDeepyEmotionalState(result.Item3);
+
+                    switch (botFeelings)
+                    {
+                        case BehaviorConstants.DeepyEmotions.gerty_tongue:
+                            DeepyEmotionalStateImage.Source = this.gerty_tongue_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_wink:
+                            DeepyEmotionalStateImage.Source = this.gerty_wink_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_big_smile:
+                            DeepyEmotionalStateImage.Source = this.gerty_big_smile_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_smile:
+                            DeepyEmotionalStateImage.Source = this.gerty_smile_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_neutral:
+                            DeepyEmotionalStateImage.Source = this.gerty_neutral_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_confused:
+                            DeepyEmotionalStateImage.Source = this.gerty_confused_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_worried:
+                            DeepyEmotionalStateImage.Source = this.gerty_worried_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_sad:
+                            DeepyEmotionalStateImage.Source = this.gerty_sad_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_nervous_1:
+                            DeepyEmotionalStateImage.Source = this.gerty_nervous_1_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_nervous_2:
+                            DeepyEmotionalStateImage.Source = this.gerty_nervous_2_image;
+                            break;
+                        case BehaviorConstants.DeepyEmotions.gerty_very_sad:
+                            DeepyEmotionalStateImage.Source = this.gerty_very_sad_image;
+                            break;
+                        default:
+                            DeepyEmotionalStateImage.Source = this.gerty_neutral_image;
+                            break;
+                    }
                 }
             }
             else
@@ -116,9 +204,25 @@ namespace Deepy1000
             }
         }
 
-        private async Task<StorageFile> SendCallToAgentProxyAsync(StorageFile inputWavFile)
+        private BehaviorConstants.DeepyEmotions GetDeepyEmotionalState(string item2)
         {
-            StorageFile result = null;
+            var botUtterance = item2.ToLowerInvariant();
+
+            if (botUtterance.Contains("i don't know what to answer"))
+                return BehaviorConstants.DeepyEmotions.gerty_nervous_1;
+            else if (botUtterance.Contains("i don't have this information"))
+                return BehaviorConstants.DeepyEmotions.gerty_nervous_2;
+            else if (botUtterance.Contains("i don't understand you"))
+                return BehaviorConstants.DeepyEmotions.gerty_confused;
+
+            return BehaviorConstants.DeepyEmotions.gerty_smile;
+        }
+
+        private async Task<Tuple<StorageFile, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
+        {
+            Tuple<StorageFile, string, string> result = null;
+
+            StorageFile outputFile = null;
 
             //Create an HTTP client object
             if (httpClient == null)
@@ -170,17 +274,23 @@ namespace Deepy1000
                         HttpResponseMessage response = await httpClient.PostAsync(requestUri, form).AsTask(cts.Token);
                         response.EnsureSuccessStatusCode();
 
+                        var responseHeaders = response.Headers;
+                        var humanUtteranceTranscript = responseHeaders["transcript"];
+                        var botUtteranceResponse = responseHeaders["response"];
+
                         // preparing output file
                         var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-                        result = await localFolder.CreateFileAsync("output.wav", CreationCollisionOption.GenerateUniqueName);
+                        outputFile = await localFolder.CreateFileAsync("output.wav", CreationCollisionOption.GenerateUniqueName);
 
-                        using (var outputFileStream = await result.OpenStreamForWriteAsync())
+                        using (var outputFileStream = await outputFile.OpenStreamForWriteAsync())
                         {
                             using (Stream responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead())
                             {
                                 responseStream.CopyTo(outputFileStream);
                             }
                         }
+
+                        result = new Tuple<StorageFile, string, string>(outputFile, humanUtteranceTranscript, botUtteranceResponse);
                     }
                     catch (Exception ex)
                     {

@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)BehaviorConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controls\AreaHeaderControl.xaml.cs">
       <DependentUpon>AreaHeaderControl.xaml</DependentUpon>
     </Compile>
@@ -49,7 +50,36 @@
     <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_big_smile.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_confused.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_emotions.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_nervous_1.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_nervous_2.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_neutral.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_sad.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_smile.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_tongue.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_very_sad.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_wink.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_worried.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_big_smile.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_confused.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_emotions.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_nervous_1.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_nervous_2.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_neutral.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_sad.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_smile.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_tongue.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_very_sad.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_wink.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_worried.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Assets\gerty_big_smile.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Assets\gerty_big_smile.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\gerty_confused.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\gerty_emotions.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\gerty_nervous_1.png" />

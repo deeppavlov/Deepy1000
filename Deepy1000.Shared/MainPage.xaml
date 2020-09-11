@@ -31,25 +31,30 @@
                                         VerticalAlignment="Top" Height="112" Grid.Row="0"/>
 
             <Border Grid.Row="1" BorderBrush="Black" BorderThickness="3" Height="382" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="#FFAEF6FF" >
-                <Image Source="/Assets/gerty_smile.png" Margin="4,4,4,4" Stretch="None" />
+                <Image x:Name="DeepyEmotionalStateImage" Source="/Assets/gerty_smile.png" Margin="4,4,4,4" Stretch="None" />
             </Border>
 
             <TextBlock Grid.Row="2" Text="TEXT CHAT" Margin="10,0,10,0" FontSize="25" FontFamily="Eurostile Extd" Foreground="Black" FontWeight="Bold" />
 
-            <Border Grid.Row="3" BorderBrush="Black" BorderThickness="3" Grid.Column="0" Margin="10,0,10,0" Background="White"/>
+            <Border Grid.Row="3" BorderBrush="Black" BorderThickness="3" Grid.Column="0" Margin="10,0,10,0" Background="White">
+                <TextBlock x:Name="BotResponseTextBlock" FontFamily="Eurostile Extd" Foreground="Black" FontWeight="Bold" FontSize="18" 
+                           Text="" TextWrapping="Wrap" Padding="10" />
+            </Border>
             <Grid Grid.Row="4" Margin="10,0,10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="85"/>
                 </Grid.ColumnDefinitions>
                 <!--<TextBlock  Text="TEXT INPUT" Margin="0,10,0,0" FontSize="25" FontFamily="Eurostile Extd" Foreground="Black" FontWeight="Bold" />-->
-                <TextBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,10,5,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Height="81" FontFamily="EuropeDemi" FontSize="36" AcceptsReturn="True" TabIndex="0" Background="White" BorderBrush="Black" BorderThickness="3,3,3,3" PlaceholderText="Type here" TextAlignment="Left" VerticalContentAlignment="Center" Padding="10,14,6,6"/>
-                <Button Grid.Column="1" Margin="5,10,0,0" VerticalAlignment="Top" Height="81" Width="80" 
+                <TextBox Grid.Column="0" x:Name="HumanInputTextBox" HorizontalAlignment="Stretch" Margin="0,10,5,0" Text="" VerticalAlignment="Top" Height="81" Foreground="Black" FontWeight="Bold" FontFamily="Eurostile Extd" FontSize="18" TabIndex="0" Background="White" BorderBrush="Black" BorderThickness="3,3,3,3" PlaceholderText="Type here" TextAlignment="Left" VerticalContentAlignment="Center" Padding="10,14,6,6"/>
+
+                <Button Grid.Column="1" Margin="5,10,0,0" VerticalAlignment="Top" Height="80" Width="80" BorderThickness="3" CornerRadius="5" BorderBrush="Black"
                         x:Name="DictateButton" Click="DictateButton_Click"
-                        BorderBrush="Black" Background="Black" FontSize="40" FontFamily="Segoe MDL2 Assets">
+                        Background="#FFE8E6D7" FontSize="40" FontFamily="Segoe MDL2 Assets">
                     <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                         <Grid>
-                            <Path x:Name="BeginRecordingPath" Data="M17.000021,13.300003C17.599999,13.300003,18.099999,13.800003,18.099999,14.400009L18.099999,15C18.099999,19.400009,15.000019,23,10.900039,23.800003L10.800001,23.800003 10.800001,30 14.599995,30 14.599995,32 3.4000287,32 3.4000287,30 7.0000088,30 7.0000088,23.900009C3.0000038,23,-2.0903099E-07,19.400009,0,15.100006L0,14.900009 0,14.800003C-2.0903099E-07,14.200012 0.50000045,13.700012 1.099977,13.700012 1.7000142,13.700012 2.2000148,14.200012 2.2000146,14.800003L2.2000146,15.200012C2.2000148,19 5.2999947,22.100006 9.0999872,22.100006 12.900041,22.100006 16.000021,19 16.000021,15.200012L16.000021,14.600006C15.900045,13.800003,16.400046,13.300003,17.000021,13.300003z M8.9000361,0C11.90004,0,14.300006,2.4000092,14.300006,5.4000092L14.300006,14.900009C14.300006,17.900009 11.90004,20.300003 8.9000361,20.300003 5.9000318,20.300003 3.5000043,17.900009 3.5000043,14.900009L3.5000043,12.400009 9.2999994,12.400009C9.5999882,12.400009 9.900037,12.200012 9.900037,11.800003 9.900037,11.5 9.7000248,11.200012 9.2999994,11.200012L3.5000043,11.200012 3.5000043,10 9.2999994,10C9.5999882,10 9.900037,9.8000031 9.900037,9.4000092 9.900037,9.1000061 9.7000248,8.8000031 9.2999994,8.8000031L3.5000043,8.8000031 3.5000043,7.8000031 9.2999994,7.8000031C9.5999882,7.8000031 9.900037,7.6000061 9.900037,7.2000122 9.8000004,7.2000122 9.5999882,7 9.2999994,7L3.5000043,7 3.5000043,5.8000031 9.2999994,5.8000031C9.5999882,5.8000031 9.900037,5.6000061 9.900037,5.2000122 9.900037,4.9000092 9.7000248,4.6000061 9.2999994,4.6000061L3.5999798,4.6000061C3.9000294,2.1000061,6.20002,0,8.9000361,0z" Stretch="Uniform" Fill="White" Width="492" Height="492" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
+                            <Path x:Name="BeginRecordingPath" Data="M17.000021,13.300003C17.599999,13.300003,18.099999,13.800003,18.099999,14.400009L18.099999,15C18.099999,19.400009,15.000019,23,10.900039,23.800003L10.800001,23.800003 10.800001,30 14.599995,30 14.599995,32 3.4000287,32 3.4000287,30 7.0000088,30 7.0000088,23.900009C3.0000038,23,-2.0903099E-07,19.400009,0,15.100006L0,14.900009 0,14.800003C-2.0903099E-07,14.200012 0.50000045,13.700012 1.099977,13.700012 1.7000142,13.700012 2.2000148,14.200012 2.2000146,14.800003L2.2000146,15.200012C2.2000148,19 5.2999947,22.100006 9.0999872,22.100006 12.900041,22.100006 16.000021,19 16.000021,15.200012L16.000021,14.600006C15.900045,13.800003,16.400046,13.300003,17.000021,13.300003z M8.9000361,0C11.90004,0,14.300006,2.4000092,14.300006,5.4000092L14.300006,14.900009C14.300006,17.900009 11.90004,20.300003 8.9000361,20.300003 5.9000318,20.300003 3.5000043,17.900009 3.5000043,14.900009L3.5000043,12.400009 9.2999994,12.400009C9.5999882,12.400009 9.900037,12.200012 9.900037,11.800003 9.900037,11.5 9.7000248,11.200012 9.2999994,11.200012L3.5000043,11.200012 3.5000043,10 9.2999994,10C9.5999882,10 9.900037,9.8000031 9.900037,9.4000092 9.900037,9.1000061 9.7000248,8.8000031 9.2999994,8.8000031L3.5000043,8.8000031 3.5000043,7.8000031 9.2999994,7.8000031C9.5999882,7.8000031 9.900037,7.6000061 9.900037,7.2000122 9.8000004,7.2000122 9.5999882,7 9.2999994,7L3.5000043,7 3.5000043,5.8000031 9.2999994,5.8000031C9.5999882,5.8000031 9.900037,5.6000061 9.900037,5.2000122 9.900037,4.9000092 9.7000248,4.6000061 9.2999994,4.6000061L3.5999798,4.6000061C3.9000294,2.1000061,6.20002,0,8.9000361,0z" 
+                                  Stretch="Uniform" Fill="Black" Width="492" Height="492" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5">
                                 <Path.RenderTransform>
                                     <TransformGroup>
                                         <TransformGroup.Children>
@@ -60,7 +65,8 @@
                                 </Path.RenderTransform>
                             </Path>
 
-                            <Path x:Name="RecordingInProgressPath" Data="M16,10.500048C12.967,10.500048 10.5,12.968048 10.5,16.000048 10.5,19.032047 12.967,21.500048 16,21.500048 19.033001,21.500048 21.5,19.032047 21.5,16.000048 21.5,12.968048 19.033001,10.500048 16,10.500048z M16,8.5000477C20.136,8.5000477 23.5,11.864048 23.5,16.000048 23.5,20.136047 20.136,23.500048 16,23.500048 11.864,23.500048 8.5,20.136047 8.5,16.000048 8.5,11.864048 11.864,8.5000477 16,8.5000477z M4,2C2.8970032,2,2,2.8970947,2,4L2,28C2,29.103027,2.8970032,30,4,30L28,30C29.102997,30,30,29.103027,30,28L30,4C30,2.8970947,29.102997,2,28,2z M4,0L28,0C30.205994,0,32,1.7940674,32,4L32,28C32,30.206055,30.205994,32,28,32L4,32C1.7940063,32,0,30.206055,0,28L0,4C0,1.7940674,1.7940063,0,4,0z" Stretch="Uniform" Fill="#FFFF0000" Width="492" Height="492" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed">
+                            <Path x:Name="RecordingInProgressPath" Data="M16,10.500048C12.967,10.500048 10.5,12.968048 10.5,16.000048 10.5,19.032047 12.967,21.500048 16,21.500048 19.033001,21.500048 21.5,19.032047 21.5,16.000048 21.5,12.968048 19.033001,10.500048 16,10.500048z M16,8.5000477C20.136,8.5000477 23.5,11.864048 23.5,16.000048 23.5,20.136047 20.136,23.500048 16,23.500048 11.864,23.500048 8.5,20.136047 8.5,16.000048 8.5,11.864048 11.864,8.5000477 16,8.5000477z M4,2C2.8970032,2,2,2.8970947,2,4L2,28C2,29.103027,2.8970032,30,4,30L28,30C29.102997,30,30,29.103027,30,28L30,4C30,2.8970947,29.102997,2,28,2z M4,0L28,0C30.205994,0,32,1.7940674,32,4L32,28C32,30.206055,30.205994,32,28,32L4,32C1.7940063,32,0,30.206055,0,28L0,4C0,1.7940674,1.7940063,0,4,0z" 
+                                  Stretch="Uniform" Fill="#FFFF0000" Width="492" Height="492" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed">
                                 <Path.RenderTransform>
                                     <TransformGroup>
                                         <TransformGroup.Children>

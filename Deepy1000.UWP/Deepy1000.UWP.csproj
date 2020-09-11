@@ -138,6 +138,17 @@
     <None Include="Deepy1000.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\gerty_big_smile.png" />
+    <Content Include="Assets\gerty_confused.png" />
+    <Content Include="Assets\gerty_nervous_1.png" />
+    <Content Include="Assets\gerty_nervous_2.png" />
+    <Content Include="Assets\gerty_neutral.png" />
+    <Content Include="Assets\gerty_sad.png" />
+    <Content Include="Assets\gerty_smile.png" />
+    <Content Include="Assets\gerty_tongue.png" />
+    <Content Include="Assets\gerty_very_sad.png" />
+    <Content Include="Assets\gerty_wink.png" />
+    <Content Include="Assets\gerty_worried.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
