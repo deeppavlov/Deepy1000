@@ -161,7 +161,9 @@ namespace Deepy1000
 
             var responseContent = JsonConvert.DeserializeObject<Dialog>(responseString);
 
-            string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput[0].Annotations.EmotionClassification);
+            var active_skill = responseContent.ActiveSkill;
+
+            string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput.FirstOrDefault(d=>d.SkillName == active_skill).Annotations.EmotionClassifications[0]);
 
             result = new Tuple<StorageFile, string, string, string>(null, HumanInputTextBox.Text, responseContent.Response, emotion);
 

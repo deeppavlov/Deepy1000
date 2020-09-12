@@ -32,7 +32,7 @@ namespace DeepPavlov.Dream.Schemas
     public class Annotations
     {
         [JsonProperty("emotion_classification")]
-        public EmotionClassification EmotionClassification { get; set; }
+        public List<EmotionClassification> EmotionClassifications { get; set; }
     }
 
     public class DebugOutput
