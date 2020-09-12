@@ -106,15 +106,15 @@ namespace Deepy1000
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
-                Tuple<StorageFile, string, string, string> result = await SendCallToAgentAsync();
+                Tuple<string, string, string> result = await SendCallToAgentAsync();
 
                 ShowResponse(result);
             }
         }
 
-        private async Task<Tuple<StorageFile, string, string, string>> SendCallToAgentAsync()
+        private async Task<Tuple<string, string, string>> SendCallToAgentAsync()
         {
-            Tuple<StorageFile, string, string, string> result = null;
+            Tuple<string, string, string> result = null;
 
             //Create an HTTP client object
             if (httpClient == null)
@@ -165,7 +165,7 @@ namespace Deepy1000
 
             string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput.FirstOrDefault(d=>d.SkillName == active_skill).Annotations.EmotionClassifications[0]);
 
-            result = new Tuple<StorageFile, string, string, string>(null, HumanInputTextBox.Text, responseContent.Response, emotion);
+            result = new Tuple<string, string, string>(HumanInputTextBox.Text, responseContent.Response, emotion);
 
             return result;
         }
@@ -217,8 +217,8 @@ namespace Deepy1000
                 var result = await SendCallToAgentProxyAsync(inputWavFile);
                 if (result!=null)
                 {
-                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(result.Item1);
-                    mediaPlayer.Play();
+                    //mediaPlayer.Source = MediaSource.CreateFromStorageFile(result.Item1);
+                    //mediaPlayer.Play();
 
                     ShowResponse(result);
                 }
@@ -239,16 +239,16 @@ namespace Deepy1000
             }
         }
 
-        private void ShowResponse(Tuple<StorageFile, string, string, string> result)
+        private void ShowResponse(Tuple<string, string, string> result)
         {
             // we shall also show what was recognized
-            this.HumanInputTextBox.Text = result.Item2.ToUpper();
+            this.HumanInputTextBox.Text = result.Item1.ToUpper();
 
             // we shall also show bot's response
-            this.BotResponseTextBlock.Text = result.Item3.ToUpper();
+            this.BotResponseTextBlock.Text = result.Item2.ToUpper();
 
             // we shall also reflect recognized information shown as image
-            var botFeelings = GetDeepyEmotionalState(result.Item3, result.Item4);
+            var botFeelings = GetDeepyEmotionalState(result.Item2, result.Item3);
 
             switch (botFeelings)
             {
@@ -316,11 +316,11 @@ namespace Deepy1000
             return BehaviorConstants.DeepyEmotions.gerty_smile;
         }
 
-        private async Task<Tuple<StorageFile, string, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
+        private async Task<Tuple<string, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
         {
-            Tuple<StorageFile, string, string, string> result = null;
+            Tuple<string, string, string> result = null;
 
-            StorageFile outputFile = null;
+            //StorageFile outputFile = null;
 
             //Create an HTTP client object
             if (httpClient == null)
@@ -372,24 +372,36 @@ namespace Deepy1000
                         HttpResponseMessage response = await httpClient.PostAsync(requestUri, form).AsTask(cts.Token);
                         response.EnsureSuccessStatusCode();
 
-                        var responseHeaders = response.Headers;
-                        var humanUtteranceTranscript = responseHeaders["transcript"];
-                        var botUtteranceResponse = responseHeaders["response"];
-                        var emotion = responseHeaders["emotion"];
+                        //var responseHeaders = response.Headers;
+                        //var humanUtteranceTranscript = responseHeaders["transcript"];
+                        //var botUtteranceResponse = responseHeaders["response"];
+                        //var emotion = responseHeaders["emotion"];
 
-                        // preparing output file
-                        var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-                        outputFile = await localFolder.CreateFileAsync("output.wav", CreationCollisionOption.GenerateUniqueName);
+                        //// preparing output file
+                        //var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                        //outputFile = await localFolder.CreateFileAsync("output.wav", CreationCollisionOption.GenerateUniqueName);
 
-                        using (var outputFileStream = await outputFile.OpenStreamForWriteAsync())
-                        {
-                            using (Stream responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead())
-                            {
-                                responseStream.CopyTo(outputFileStream);
-                            }
-                        }
+                        //using (var outputFileStream = await outputFile.OpenStreamForWriteAsync())
+                        //{
+                        //    using (Stream responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead())
+                        //    {
+                        //        responseStream.CopyTo(outputFileStream);
+                        //    }
+                        //}
 
-                        result = new Tuple<StorageFile, string, string, string>(outputFile, humanUtteranceTranscript, botUtteranceResponse, emotion);
+                        var responseString = await response.Content.ReadAsStringAsync();
+
+                        var responseContent = JsonConvert.DeserializeObject<Dialog>(responseString);
+
+                        var active_skill = responseContent.ActiveSkill;
+
+                        string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput.FirstOrDefault(d => d.SkillName == active_skill).Annotations.EmotionClassifications[0]);
+
+                        result = new Tuple<string, string, string>(HumanInputTextBox.Text, responseContent.Response, emotion);
+
+                        //return result;
+
+                        //result = new Tuple<string, string, string>(outputFile, humanUtteranceTranscript, botUtteranceResponse, emotion);
                     }
                     catch (Exception ex)
                     {
