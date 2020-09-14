@@ -239,8 +239,11 @@ namespace Deepy1000
             }
         }
 
-        private void ShowResponse(Tuple<string, string, string> result)
+        private async void ShowResponse(Tuple<string, string, string> result)
         {
+            // sending to TTS
+            await this.Play(result.Item2);
+
             // we shall also show what was recognized
             this.HumanInputTextBox.Text = result.Item1.ToUpper();
 
@@ -291,6 +294,14 @@ namespace Deepy1000
             }
         }
 
+        private async Task Play(string textForTts)
+        {
+            var storageFile = await SendCallToTtsAsync(textForTts);
+
+            mediaPlayer.Source = MediaSource.CreateFromStorageFile(storageFile);
+            mediaPlayer.Play();
+        }
+
         private BehaviorConstants.DeepyEmotions GetDeepyEmotionalState(string botUtteranceOriginal, string emotion)
         {
             var botUtterance = botUtteranceOriginal.ToLowerInvariant();
@@ -314,6 +325,90 @@ namespace Deepy1000
             }
 
             return BehaviorConstants.DeepyEmotions.gerty_smile;
+        }
+
+        private async Task<StorageFile> SendCallToTtsAsync(string text)
+        {
+            StorageFile result = null;
+
+            //Create an HTTP client object
+            if (httpClient == null)
+                httpClient = new Windows.Web.Http.HttpClient();
+
+            //Add a user-agent header to the GET request. 
+            var headers = httpClient.DefaultRequestHeaders;
+
+            //The safe way to add a header value is to use the TryParseAdd method and verify the return value is true,
+            //especially if the header value is coming from user input.
+            string header = "ie";
+            if (!headers.UserAgent.TryParseAdd(header))
+            {
+                throw new Exception("Invalid header value: " + header);
+            }
+
+            header = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+            if (!headers.UserAgent.TryParseAdd(header))
+            {
+                throw new Exception("Invalid header value: " + header);
+            }
+
+            
+
+            //Send the GET request asynchronously and retrieve the response as a string.
+            Windows.Web.Http.HttpResponseMessage httpResponse = new Windows.Web.Http.HttpResponseMessage();
+            string httpResponseBody = "";
+
+
+            try
+            {
+                var body = new Dictionary<string, string>();
+                body["text"] = text;
+
+                // encoding for web
+                text = System.Net.WebUtility.UrlEncode(text);
+
+
+                Uri requestUri = new Uri("http://10.11.1.41:4344/tts?text=" + text);
+
+                var json = JsonConvert.SerializeObject(body);
+                // preparing for HTTP transfer
+                HttpStringContent stringContent = new HttpStringContent(json, UnicodeEncoding.Utf8, "application/json");
+
+                // preparing POST request
+                //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+
+                //request.Content = stringContent;
+
+                // 100 sec
+                cts = new CancellationTokenSource(100000);
+
+                HttpResponseMessage response = await httpClient.PostAsync(requestUri, null).AsTask(cts.Token);
+                response.EnsureSuccessStatusCode();
+
+                // preparing output file
+                var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                result = await localFolder.CreateFileAsync("output.wav", CreationCollisionOption.GenerateUniqueName);
+
+                using (var outputFileStream = await result.OpenStreamForWriteAsync())
+                {
+                    using (Stream responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead())
+                    {
+                        responseStream.CopyTo(outputFileStream);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                httpResponseBody = "Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message;
+
+                MessageDialog messageDialog = new MessageDialog("http response error: " + httpResponseBody);
+                await messageDialog.ShowAsync();
+
+                return null;
+            }
+
+            // returning our file
+            return result;
         }
 
         private async Task<Tuple<string, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
@@ -372,8 +467,8 @@ namespace Deepy1000
                         HttpResponseMessage response = await httpClient.PostAsync(requestUri, form).AsTask(cts.Token);
                         response.EnsureSuccessStatusCode();
 
-                        //var responseHeaders = response.Headers;
-                        //var humanUtteranceTranscript = responseHeaders["transcript"];
+                        var responseHeaders = response.Headers;
+                        var humanUtteranceTranscript = responseHeaders["transcript"];
                         //var botUtteranceResponse = responseHeaders["response"];
                         //var emotion = responseHeaders["emotion"];
 
@@ -397,7 +492,7 @@ namespace Deepy1000
 
                         string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput.FirstOrDefault(d => d.SkillName == active_skill).Annotations.EmotionClassifications[0]);
 
-                        result = new Tuple<string, string, string>(HumanInputTextBox.Text, responseContent.Response, emotion);
+                        result = new Tuple<string, string, string>(humanUtteranceTranscript, responseContent.Response, emotion);
 
                         //return result;
 
