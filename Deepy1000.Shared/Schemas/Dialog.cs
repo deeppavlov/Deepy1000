@@ -48,6 +48,9 @@ namespace DeepPavlov.Dream.Schemas
 
         [JsonProperty("confidence")]
         public double Confidence { get; set; }
+
+        [JsonProperty("ssml_tagged_text")]
+        public string SsmlTaggedText { get; set; }
     }
 
     public class Dialog

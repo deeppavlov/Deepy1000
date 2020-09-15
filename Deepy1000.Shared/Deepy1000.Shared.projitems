@@ -29,6 +29,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Schemas\Dialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schemas\StructuredResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Controls\AreaHeaderControl.xaml">

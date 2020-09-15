@@ -27,6 +27,8 @@ using Windows.Web.Http;
 using Newtonsoft.Json;
 using DeepPavlov.Dream.Schemas;
 using System.Net.Mime;
+using Deepy1000.Shared.Schemas;
+using Uno.Extensions;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -106,15 +108,15 @@ namespace Deepy1000
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
-                Tuple<string, string, string> result = await SendCallToAgentAsync();
+                var result = await SendCallToAgentAsync();
 
                 ShowResponse(result);
             }
         }
 
-        private async Task<Tuple<string, string, string>> SendCallToAgentAsync()
+        private async Task<StructuredResponse> SendCallToAgentAsync()
         {
-            Tuple<string, string, string> result = null;
+            StructuredResponse result = null;
 
             //Create an HTTP client object
             if (httpClient == null)
@@ -163,9 +165,16 @@ namespace Deepy1000
 
             var active_skill = responseContent.ActiveSkill;
 
-            string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput.FirstOrDefault(d=>d.SkillName == active_skill).Annotations.EmotionClassifications[0]);
+            var debugOutput = responseContent.DebugOutput.FirstOrDefault(d => d.SkillName == active_skill);
 
-            result = new Tuple<string, string, string>(HumanInputTextBox.Text, responseContent.Response, emotion);
+            string emotion = GetTopEmotionFromClassification(debugOutput.Annotations.EmotionClassifications[0]);
+
+            result = new StructuredResponse { HumanUtterance = HumanInputTextBox.Text, 
+                                              BotUtterance = responseContent.Response, 
+                                              BotEmotion = emotion, 
+                                              SsmlTaggedText = debugOutput.SsmlTaggedText, 
+                                              IsHumanUtteranceTranscribed = false,
+                                              DebugOutputs = responseContent.DebugOutput};
 
             return result;
         }
@@ -239,19 +248,24 @@ namespace Deepy1000
             }
         }
 
-        private async void ShowResponse(Tuple<string, string, string> result)
+        private async void ShowResponse(StructuredResponse result)
         {
+            string botUtterance = result.BotUtterance;
+
+            var emodji = GetEmodjiFromBotUtterance(botUtterance, out botUtterance);
+
             // sending to TTS
-            await this.Play(result.Item2);
+            await this.Play(botUtterance);
 
             // we shall also show what was recognized
-            this.HumanInputTextBox.Text = result.Item1.ToUpper();
+            this.HumanInputTextBox.Text = result.HumanUtterance.ToUpper();
 
             // we shall also show bot's response
-            this.BotResponseTextBlock.Text = result.Item2.ToUpper();
+            this.BotResponseTextBlock.Text = botUtterance.ToUpper();
+
 
             // we shall also reflect recognized information shown as image
-            var botFeelings = GetDeepyEmotionalState(result.Item2, result.Item3);
+            var botFeelings = GetDeepyEmotionalState(botUtterance, result.BotEmotion, result.SsmlTaggedText, emodji);
 
             switch (botFeelings)
             {
@@ -294,6 +308,28 @@ namespace Deepy1000
             }
         }
 
+        private string GetEmodjiFromBotUtterance(string botUtterance, out string cleanedBotUtterance)
+        {
+            if (botUtterance.StartsWith("🙁"))
+            {
+                cleanedBotUtterance = botUtterance.Substring(3);
+                return "🙁";
+            }
+            else if (botUtterance.StartsWith("😊"))
+            {
+                cleanedBotUtterance = botUtterance.Substring(3);
+                return "😊";
+            }
+            else if (botUtterance.StartsWith("🙂"))
+            {
+                cleanedBotUtterance = botUtterance.Substring(3);
+                return "🙂";
+            }
+
+            cleanedBotUtterance = botUtterance;
+            return string.Empty;
+        }
+
         private async Task Play(string textForTts)
         {
             var storageFile = await SendCallToTtsAsync(textForTts);
@@ -302,7 +338,7 @@ namespace Deepy1000
             mediaPlayer.Play();
         }
 
-        private BehaviorConstants.DeepyEmotions GetDeepyEmotionalState(string botUtteranceOriginal, string emotion)
+        private BehaviorConstants.DeepyEmotions GetDeepyEmotionalState(string botUtteranceOriginal, string emotion, string ssmlTaggedText, string emodji)
         {
             var botUtterance = botUtteranceOriginal.ToLowerInvariant();
 
@@ -312,18 +348,47 @@ namespace Deepy1000
                 return BehaviorConstants.DeepyEmotions.gerty_nervous_2;
             else if (botUtterance.Contains("i don't understand you"))
                 return BehaviorConstants.DeepyEmotions.gerty_confused;
-            else
+            else if (!ssmlTaggedText.IsNullOrEmpty())
             {
-                // small override
-                if (emotion == "neutral") return BehaviorConstants.DeepyEmotions.gerty_smile;
-                if (emotion == "anger") return BehaviorConstants.DeepyEmotions.gerty_worried;
-                if (emotion == "fear") return BehaviorConstants.DeepyEmotions.gerty_nervous_1;
-                if (emotion == "joy") return BehaviorConstants.DeepyEmotions.gerty_big_smile;
-                if (emotion == "love") return BehaviorConstants.DeepyEmotions.gerty_wink;
-                if (emotion == "sadness") return BehaviorConstants.DeepyEmotions.gerty_very_sad;
-                if (emotion == "surprise") return BehaviorConstants.DeepyEmotions.gerty_tongue;
+                if (ssmlTaggedText.StartsWith("<amazon:emotion name="))
+                {
+                    var amazon_emotion_tail = ssmlTaggedText.Substring(22);
+                    var tail_idx = amazon_emotion_tail.IndexOf("\"");
+                    var amazon_emotion = amazon_emotion_tail.Substring(0, tail_idx - 1);
+                    if (amazon_emotion == "disappointed")
+                        return BehaviorConstants.DeepyEmotions.gerty_worried;
+                    else if (amazon_emotion == "excited")
+                        return BehaviorConstants.DeepyEmotions.gerty_big_smile;
+                }
+            }
+            if (!emodji.IsNullOrEmpty())
+            {
+                if (emodji == "🙁")
+                {
+                    return BehaviorConstants.DeepyEmotions.gerty_sad;
+                }
+                else if (emodji == "😊")
+                {
+                    return BehaviorConstants.DeepyEmotions.gerty_big_smile;
+                }
+                else if (emodji == "🙂")
+                {
+                    return BehaviorConstants.DeepyEmotions.gerty_smile;
+                }
             }
 
+            // Fall back to Emotion Classification
+
+            // small override
+            if (emotion == "neutral") return BehaviorConstants.DeepyEmotions.gerty_smile;
+            if (emotion == "anger") return BehaviorConstants.DeepyEmotions.gerty_worried;
+            if (emotion == "fear") return BehaviorConstants.DeepyEmotions.gerty_nervous_1;
+            if (emotion == "joy") return BehaviorConstants.DeepyEmotions.gerty_big_smile;
+            if (emotion == "love") return BehaviorConstants.DeepyEmotions.gerty_wink;
+            if (emotion == "sadness") return BehaviorConstants.DeepyEmotions.gerty_very_sad;
+            if (emotion == "surprise") return BehaviorConstants.DeepyEmotions.gerty_tongue;
+
+            // Fall back to default option
             return BehaviorConstants.DeepyEmotions.gerty_smile;
         }
 
@@ -374,11 +439,6 @@ namespace Deepy1000
                 // preparing for HTTP transfer
                 HttpStringContent stringContent = new HttpStringContent(json, UnicodeEncoding.Utf8, "application/json");
 
-                // preparing POST request
-                //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-
-                //request.Content = stringContent;
-
                 // 100 sec
                 cts = new CancellationTokenSource(100000);
 
@@ -411,9 +471,9 @@ namespace Deepy1000
             return result;
         }
 
-        private async Task<Tuple<string, string, string>> SendCallToAgentProxyAsync(StorageFile inputWavFile)
+        private async Task<StructuredResponse> SendCallToAgentProxyAsync(StorageFile inputWavFile)
         {
-            Tuple<string, string, string> result = null;
+            StructuredResponse result = null;
 
             //StorageFile outputFile = null;
 
@@ -469,20 +529,6 @@ namespace Deepy1000
 
                         var responseHeaders = response.Headers;
                         var humanUtteranceTranscript = responseHeaders["transcript"];
-                        //var botUtteranceResponse = responseHeaders["response"];
-                        //var emotion = responseHeaders["emotion"];
-
-                        //// preparing output file
-                        //var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-                        //outputFile = await localFolder.CreateFileAsync("output.wav", CreationCollisionOption.GenerateUniqueName);
-
-                        //using (var outputFileStream = await outputFile.OpenStreamForWriteAsync())
-                        //{
-                        //    using (Stream responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead())
-                        //    {
-                        //        responseStream.CopyTo(outputFileStream);
-                        //    }
-                        //}
 
                         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -490,13 +536,19 @@ namespace Deepy1000
 
                         var active_skill = responseContent.ActiveSkill;
 
-                        string emotion = GetTopEmotionFromClassification(responseContent.DebugOutput.FirstOrDefault(d => d.SkillName == active_skill).Annotations.EmotionClassifications[0]);
+                        var debugOutput = responseContent.DebugOutput.FirstOrDefault(d => d.SkillName == active_skill);
 
-                        result = new Tuple<string, string, string>(humanUtteranceTranscript, responseContent.Response, emotion);
+                        string emotion = GetTopEmotionFromClassification(debugOutput.Annotations.EmotionClassifications[0]);
 
-                        //return result;
-
-                        //result = new Tuple<string, string, string>(outputFile, humanUtteranceTranscript, botUtteranceResponse, emotion);
+                        result = new StructuredResponse
+                        {
+                            HumanUtterance = humanUtteranceTranscript,
+                            BotUtterance = responseContent.Response,
+                            BotEmotion = emotion,
+                            SsmlTaggedText = debugOutput.SsmlTaggedText,
+                            IsHumanUtteranceTranscribed = true,
+                            DebugOutputs = responseContent.DebugOutput
+                        };
                     }
                     catch (Exception ex)
                     {
