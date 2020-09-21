@@ -433,7 +433,7 @@ namespace Deepy1000
                 text = System.Net.WebUtility.UrlEncode(text);
 
 
-                Uri requestUri = new Uri("http://10.11.1.41:4344/tts?text=" + text);
+                Uri requestUri = new Uri("http://10.11.1.41:4343/tts?text=" + text);
 
                 var json = JsonConvert.SerializeObject(body);
                 // preparing for HTTP transfer
