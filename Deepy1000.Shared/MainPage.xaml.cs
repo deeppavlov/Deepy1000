@@ -50,10 +50,12 @@ namespace Deepy1000
         MediaEncodingProfile mediaProfile;
         MediaPlayer mediaPlayer;
 
-        private string _agentUri = "http://10.11.1.41:4242/";
-        private string _ttsUri = "http://10.11.1.41:4343/tts?text=";
-        private string _cloneTtsUri = "http://10.11.1.41:4344/tts?text=";
-        private string _asrUri = "http://10.11.1.41:4343/asr?user_id=";
+        private static string _baseUri = "http://10.11.1.41";
+
+        private static string _agentUri = _baseUri + ":4242/";
+        private static string _ttsUri = _baseUri + ":4343/tts?text=";
+        private static string _cloneTtsUri = _baseUri + ":4344/tts?text=";
+        private static string _asrUri = _baseUri +  ":4343/asr?user_id=";
 
         // images for Gerty
         BitmapImage gerty_big_smile_image;
