@@ -50,6 +50,11 @@ namespace Deepy1000
         MediaEncodingProfile mediaProfile;
         MediaPlayer mediaPlayer;
 
+        private string _agentUri = "http://10.11.1.41:4242/";
+        private string _ttsUri = "http://10.11.1.41:4343/tts?text=";
+        private string _cloneTtsUri = "http://10.11.1.41:4344/tts?text=";
+        private string _asrUri = "http://10.11.1.41:4343/asr?user_id=";
+
         // images for Gerty
         BitmapImage gerty_big_smile_image;
         BitmapImage gerty_confused_image;
@@ -139,7 +144,7 @@ namespace Deepy1000
                 throw new Exception("Invalid header value: " + header);
             }
 
-            Uri requestUri = new Uri("http://10.11.1.41:4242/");
+            Uri requestUri = new Uri(_agentUri);
 
             var body = new Dictionary<string, string>();
             body["user_id"] = userId;
@@ -433,7 +438,7 @@ namespace Deepy1000
                 text = System.Net.WebUtility.UrlEncode(text);
 
 
-                Uri requestUri = new Uri("http://10.11.1.41:4343/tts?text=" + text);
+                Uri requestUri = new Uri(_ttsUri + text);
 
                 var json = JsonConvert.SerializeObject(body);
                 // preparing for HTTP transfer
@@ -498,7 +503,7 @@ namespace Deepy1000
                 throw new Exception("Invalid header value: " + header);
             }
 
-            Uri requestUri = new Uri("http://10.11.1.41:4343/asr?user_id=" + userId);
+            Uri requestUri = new Uri(_asrUri + userId);
 
             //Send the GET request asynchronously and retrieve the response as a string.
             Windows.Web.Http.HttpResponseMessage httpResponse = new Windows.Web.Http.HttpResponseMessage();
